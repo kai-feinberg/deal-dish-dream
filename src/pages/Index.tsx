@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,19 +11,23 @@ import { useAuth } from '@/context/AuthContext';
 
 const Index = () => {
   const { user, isLoaded, signIn, signUp, hasCompletedOnboarding } = useAuth();
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [firstName, setFirstName] = React.useState("");
-  const [lastName, setLastName] = React.useState("");
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [justSignedUp, setJustSignedUp] = useState(false);
 
   if (!isLoaded) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
   if (user) {
-    // Redirect based on onboarding status
-    return <Navigate to={hasCompletedOnboarding ? "/upload" : "/onboarding"} replace />;
+    // Redirect based on onboarding status or if just signed up
+    if (justSignedUp || !hasCompletedOnboarding) {
+      return <Navigate to="/onboarding" replace />;
+    }
+    return <Navigate to="/upload" replace />;
   }
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -45,6 +49,7 @@ const Index = () => {
     
     try {
       await signUp(email, password, firstName, lastName);
+      setJustSignedUp(true);
     } catch (err) {
       // Error is handled in the context
     } finally {

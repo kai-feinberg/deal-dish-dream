@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ChevronRight } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { UserPreferences } from '@/types';
+import { UserPreferences } from '@/types/database';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -35,7 +36,11 @@ const OnboardingPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [step, setStep] = useState(1);
-  const [preferences, setPreferences] = useState<UserPreferences>({
+  const [preferences, setPreferences] = useState<{
+    dietaryRestrictions: string[];
+    allergies: string[];
+    preferences: string[];
+  }>({
     dietaryRestrictions: [],
     allergies: [],
     preferences: [],

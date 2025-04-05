@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 import { useToast } from "@/components/ui/use-toast";
+import { Profile } from "@/types/database";
 
 type AuthContextType = {
   user: User | null;
@@ -68,7 +69,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    setHasCompletedOnboarding(data?.has_completed_onboarding || false);
+    const profile = data as Profile;
+    setHasCompletedOnboarding(profile?.has_completed_onboarding || false);
   };
 
   const signIn = async (email: string, password: string) => {

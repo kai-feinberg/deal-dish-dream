@@ -11,6 +11,7 @@ import UploadPage from "./pages/Upload";
 import RecipesPage from "./pages/Recipes";
 import RecipeDetailPage from "./pages/RecipeDetail";
 import ProfilePage from "./pages/Profile";
+import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Protected from "./components/Protected";
 import { AuthProvider } from "./context/AuthContext";
@@ -50,6 +51,11 @@ const App = () => (
               <Route path="/profile" element={
                 <Protected>
                   <ProfilePage />
+                </Protected>
+              } />
+              <Route path="/settings" element={
+                <Protected>
+                  <SettingsPage />
                 </Protected>
               } />
               <Route path="*" element={<NotFound />} />
