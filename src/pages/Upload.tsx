@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { Camera, Image, Loader2 } from "lucide-react";
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
+import { OPENROUTER_API_KEY } from '@/lib/openrouter';
 
 const UploadPage = () => {
   const [files, setFiles] = useState<File[]>([]);
@@ -18,7 +19,7 @@ const UploadPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user } = useAuth();
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.length) return;
