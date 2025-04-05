@@ -27,17 +27,16 @@ const Settings = () => {
 
     setIsSaving(true);
     try {
-      // Create or update API key using a raw query to bypass TypeScript errors
+      // Use RPC to save the key
       const { error } = await supabase.rpc('upsert_api_key', {
         p_user_id: user.id,
         p_provider: 'openrouter',
         p_api_key: apiKey
-      }).maybeSingle();
+      });
 
       if (error) {
-        // Fallback to direct insert/update if RPC doesn't exist
-        const { error: fallbackError } = await supabase
-          .from('user_api_keys')
+        // Fallback to direct insert/update if RPC doesn't exist yet
+        const { error: fallbackError } = await supabase.from('user_api_keys')
           .upsert({
             user_id: user.id,
             provider: 'openrouter',
