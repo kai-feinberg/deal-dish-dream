@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -108,7 +108,7 @@ const mockRecipes: Recipe[] = [
 ];
 
 const RecipesPage = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [recipes, setRecipes] = useState<Recipe[]>(mockRecipes);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>(recipes);
