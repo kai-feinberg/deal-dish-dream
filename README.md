@@ -1,76 +1,123 @@
-# Welcome to your Lovable project
+# Deal Dish Dream 🍽️
 
-## Project info
+## About the Application
 
-**URL**: https://lovable.dev/projects/6788de2a-12fe-40e2-baa0-873f1c983348
+Deal Dish Dream is an innovative application that transforms grocery shopping deals into delicious recipes. By leveraging advanced AI technology, it helps users:
 
-## How can I edit this code?
+- Make the most of their grocery store deals
+- Reduce food waste by planning meals around sale items
+- Save money while creating delicious, home-cooked meals
+- Discover new recipes tailored to available ingredients
+- Build a personalized recipe collection
 
-There are several ways of editing your application.
+## Why We Built This
 
-**Use Lovable**
+In today's economy, many people struggle with:
+- Rising grocery costs
+- Food waste from unplanned purchases
+- Limited cooking inspiration
+- Time-consuming meal planning
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/6788de2a-12fe-40e2-baa0-873f1c983348) and start prompting.
+Deal Dish Dream addresses these challenges by automatically generating recipes based on store deals, helping users save money while expanding their culinary horizons. The application encourages sustainable shopping habits and reduces food waste by focusing recipes around items currently on sale.
 
-Changes made via Lovable will be committed automatically to this repo.
+## Technical Architecture
 
-**Use your preferred IDE**
+### Core Services
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. **OpenRouter Service** (`src/services/openRouterService.ts`)
+   - Handles AI-powered recipe generation using Google's Gemini model
+   - Processes images of grocery deals
+   - Generates structured recipe data with ingredients, instructions, and cooking details
+   - Identifies sale items and incorporates them into recipes
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+2. **Supabase Integration** (`src/integrations/supabase`)
+   - User authentication and management
+   - Recipe storage and retrieval
+   - User preferences and settings
+   - Real-time data synchronization
 
-Follow these steps:
+### Key Components
+
+1. **Authentication System with Supabase**
+   - Secure user login/signup
+   - Profile management
+   - Session handling
+
+2. **Recipe Management**
+   - Recipe generation from deal images
+   - Recipe storage and organization
+   - Personalized recipe collections
+   - Recipe sharing capabilities
+
+3. **Deal Processing**
+   - Image processing for deal recognition
+   - Deal item extraction and categorization
+   - Smart recipe suggestions based on deals
+
+## Benefits
+
+1. **Financial Benefits**
+   - Reduced grocery spending through deal-focused recipes
+   - Better meal planning around sales
+   - Minimized food waste
+
+2. **Culinary Benefits**
+   - Expanded recipe repertoire
+   - Customized recipe suggestions
+   - Simplified meal planning
+
+3. **Time-Saving Benefits**
+   - Automated recipe generation
+   - Quick meal ideas based on available deals
+   - Streamlined shopping process
+
+4. **Environmental Impact**
+   - Reduced food waste
+   - More sustainable shopping habits
+   - Optimized ingredient usage
+
+## Getting Started
+
+### Prerequisites
+- Node.js & npm - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Supabase account for database access
+- OpenRouter API key for AI functionality
+
+### Installation
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Clone the repository
+git clone https://github.com/kai-feinberg/deal-dish-dream
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Navigate to project directory
+cd deal-dish-dream
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Set up environment variables
+cp .env.example .env
+# Add your API keys and configuration
+
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Technology Stack
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- **Frontend**: React with TypeScript
+- **Styling**: Tailwind CSS with shadcn-ui
+- **Build Tool**: Vite
+- **Database**: Supabase
+- **AI Integration**: OpenRouter API with Google's Gemini model
+- **Authentication**: Supabase Auth
+- **State Management**: React Context/Hooks
+- **Development Tools**: Lovable, Cursor
 
-**Use GitHub Codespaces**
+## Contributing
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+We welcome contributions! Please see our contributing guidelines for more details.
 
-## What technologies are used for this project?
+## License
 
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-- Supabase
-
-Using Lovable and Cursor
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/6788de2a-12fe-40e2-baa0-873f1c983348) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes it is!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+This project is licensed under the MIT License - see the LICENSE file for details.
