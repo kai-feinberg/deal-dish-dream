@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { useUser, useSignIn, useSignUp } from "@clerk/clerk-react";
 import { Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,27 +7,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChefHat } from "lucide-react";
-import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/context/AuthContext';
 
 const Index = () => {
-  const { isSignedIn, user, isLoaded } = useUser();
-  const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
-  const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
+  const { user, isLoaded, signIn, signUp, hasCompletedOnboarding } = useAuth();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const { toast } = useToast();
 
-  // Check if user has completed onboarding
-  const hasCompletedOnboarding = user?.publicMetadata?.hasCompletedOnboarding;
-
-  if (!isLoaded || !isSignInLoaded || !isSignUpLoaded) {
+  if (!isLoaded) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
-  if (isSignedIn) {
+  if (user) {
     // Redirect based on onboarding status
     return <Navigate to={hasCompletedOnboarding ? "/upload" : "/onboarding"} replace />;
   }
@@ -38,20 +31,9 @@ const Index = () => {
     setIsSubmitting(true);
     
     try {
-      const result = await signIn.create({
-        identifier: email,
-        password,
-      });
-      
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId });
-      }
-    } catch (err: any) {
-      toast({
-        title: "Error signing in",
-        description: err.errors?.[0]?.message || "Please check your credentials and try again.",
-        variant: "destructive",
-      });
+      await signIn(email, password);
+    } catch (err) {
+      // Error is handled in the context
     } finally {
       setIsSubmitting(false);
     }
@@ -62,22 +44,9 @@ const Index = () => {
     setIsSubmitting(true);
     
     try {
-      const result = await signUp.create({
-        emailAddress: email,
-        password,
-        firstName,
-        lastName,
-      });
-      
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId });
-      }
-    } catch (err: any) {
-      toast({
-        title: "Error signing up",
-        description: err.errors?.[0]?.message || "Please check your information and try again.",
-        variant: "destructive",
-      });
+      await signUp(email, password, firstName, lastName);
+    } catch (err) {
+      // Error is handled in the context
     } finally {
       setIsSubmitting(false);
     }

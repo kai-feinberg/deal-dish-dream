@@ -1,6 +1,4 @@
-
-import { useState } from 'react';
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,18 +8,63 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { UserPreferences } from '@/types';
 import { LogOut, Settings, Bell, Shield, User } from "lucide-react";
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Profile {
+  id: string;
+  first_name: string;
+  last_name: string;
+  has_completed_onboarding: boolean;
+  created_at: string;
+}
 
 const ProfilePage = () => {
-  const { user } = useUser();
-  const { signOut } = useClerk();
+  const { user, signOut } = useAuth();
   const { toast } = useToast();
   const [isUpdating, setIsUpdating] = useState(false);
-  
-  // In a real app, these would come from Supabase
-  const userPreferences = user?.publicMetadata.preferences as UserPreferences || {
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [userPreferences, setUserPreferences] = useState<UserPreferences>({
     dietaryRestrictions: [],
     allergies: [],
     preferences: [],
+  });
+  
+  useEffect(() => {
+    if (user) {
+      fetchProfileData();
+    }
+  }, [user]);
+  
+  const fetchProfileData = async () => {
+    try {
+      // Fetch profile data
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user?.id)
+        .single();
+      
+      if (profileError) throw profileError;
+      setProfile(profileData as Profile);
+      
+      // Fetch preferences data
+      const { data: preferencesData, error: preferencesError } = await supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', user?.id)
+        .single();
+      
+      if (preferencesError) throw preferencesError;
+      
+      setUserPreferences({
+        dietaryRestrictions: preferencesData.dietary_restrictions || [],
+        allergies: preferencesData.allergies || [],
+        preferences: preferencesData.preferences || [],
+      });
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    }
   };
   
   const handleSignOut = async () => {
@@ -60,8 +103,8 @@ const ProfilePage = () => {
                 <User className="h-8 w-8 text-muted-foreground" />
               </div>
               <div>
-                <CardTitle>{user?.fullName || "User"}</CardTitle>
-                <CardDescription>{user?.primaryEmailAddress?.emailAddress}</CardDescription>
+                <CardTitle>{profile?.first_name} {profile?.last_name || "User"}</CardTitle>
+                <CardDescription>{user?.email}</CardDescription>
               </div>
             </CardHeader>
             <CardContent>
@@ -225,15 +268,15 @@ const ProfilePage = () => {
                 <CardContent className="space-y-4">
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">Email</h3>
-                    <p>{user?.primaryEmailAddress?.emailAddress}</p>
+                    <p>{user?.email}</p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">Name</h3>
-                    <p>{user?.fullName || "Not provided"}</p>
+                    <p>{profile ? `${profile.first_name} ${profile.last_name}` : "Not provided"}</p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground">Member since</h3>
-                    <p>{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Unknown"}</p>
+                    <p>{profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : "Unknown"}</p>
                   </div>
                 </CardContent>
                 <CardFooter>

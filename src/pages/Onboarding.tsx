@@ -1,6 +1,4 @@
-
 import { useState } from 'react';
-import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { ChevronRight } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { UserPreferences } from '@/types';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 // Sample preferences data
 const dietaryOptions = [
@@ -31,7 +31,7 @@ const commonAllergies = [
 ];
 
 const OnboardingPage = () => {
-  const { user, isLoaded } = useUser();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [step, setStep] = useState(1);
@@ -43,7 +43,7 @@ const OnboardingPage = () => {
   const [customPreference, setCustomPreference] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!isLoaded) {
+  if (!user) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
@@ -100,15 +100,31 @@ const OnboardingPage = () => {
     setIsSubmitting(true);
     
     try {
-      // Save to Supabase (this would be implemented after Supabase integration)
-      // For now just update user metadata via Clerk
-      await user?.update({
-        publicMetadata: {
-          ...user.publicMetadata,
-          hasCompletedOnboarding: true,
-          preferences: preferences,
-        },
-      });
+      // Update user preferences in Supabase
+      const { error: preferencesError } = await supabase
+        .from('user_preferences')
+        .update({
+          dietary_restrictions: preferences.dietaryRestrictions,
+          allergies: preferences.allergies,
+          preferences: preferences.preferences
+        })
+        .eq('user_id', user.id);
+
+      if (preferencesError) {
+        throw preferencesError;
+      }
+      
+      // Update profile to mark onboarding as complete
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          has_completed_onboarding: true
+        })
+        .eq('id', user.id);
+        
+      if (profileError) {
+        throw profileError;
+      }
       
       toast({
         title: "Preferences saved!",
@@ -116,12 +132,13 @@ const OnboardingPage = () => {
       });
       
       navigate("/upload");
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error saving preferences",
-        description: "Please try again later.",
+        description: error.message || "Please try again later.",
         variant: "destructive",
       });
+      console.error(error);
     } finally {
       setIsSubmitting(false);
     }
