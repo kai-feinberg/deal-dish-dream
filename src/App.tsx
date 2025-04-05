@@ -1,70 +1,42 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from "./components/Layout";
-import Index from "./pages/Index";
-import OnboardingPage from "./pages/Onboarding";
-import UploadPage from "./pages/Upload";
-import RecipesPage from "./pages/Recipes";
-import RecipeDetailPage from "./pages/RecipeDetail";
-import ProfilePage from "./pages/Profile";
-import SettingsPage from "./pages/Settings";
-import NotFound from "./pages/NotFound";
-import Protected from "./components/Protected";
-import { AuthProvider } from "./context/AuthContext";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ClerkProvider } from '@clerk/clerk-react';
+import { Toaster } from '@/components/ui/toaster';
+import Layout from '@/components/Layout';
+import IndexPage from '@/pages/Index';
+import NotFound from '@/pages/NotFound';
+import Protected from '@/components/Protected';
+import Recipes from '@/pages/Recipes';
+import Upload from '@/pages/Upload';
+import RecipeDetail from '@/pages/RecipeDetail';
+import Onboarding from '@/pages/Onboarding';
+import Profile from '@/pages/Profile';
+import Settings from '@/pages/Settings';
+import { AuthProvider } from './context/AuthContext';
+import { RecipeProvider } from './context/RecipeContext';
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <AuthProvider>
-        <TooltipProvider>
+function App() {
+  return (
+    <AuthProvider>
+      <RecipeProvider>
+        <Router>
           <Toaster />
-          <Sonner />
           <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Index />} />
-              <Route path="/onboarding" element={
-                <Protected>
-                  <OnboardingPage />
-                </Protected>
-              } />
-              <Route path="/upload" element={
-                <Protected>
-                  <UploadPage />
-                </Protected>
-              } />
-              <Route path="/recipes" element={
-                <Protected>
-                  <RecipesPage />
-                </Protected>
-              } />
-              <Route path="/recipes/:id" element={
-                <Protected>
-                  <RecipeDetailPage />
-                </Protected>
-              } />
-              <Route path="/profile" element={
-                <Protected>
-                  <ProfilePage />
-                </Protected>
-              } />
-              <Route path="/settings" element={
-                <Protected>
-                  <SettingsPage />
-                </Protected>
-              } />
+            <Route path="/" element={<Layout />}>
+              <Route index element={<IndexPage />} />
+              <Route path="onboarding" element={<Protected><Onboarding /></Protected>} />
+              <Route path="recipes" element={<Protected><Recipes /></Protected>} />
+              <Route path="recipes/:id" element={<Protected><RecipeDetail /></Protected>} />
+              <Route path="upload" element={<Protected><Upload /></Protected>} />
+              <Route path="profile" element={<Protected><Profile /></Protected>} />
+              <Route path="settings" element={<Protected><Settings /></Protected>} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
-        </TooltipProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+        </Router>
+      </RecipeProvider>
+    </AuthProvider>
+  );
+}
 
 export default App;

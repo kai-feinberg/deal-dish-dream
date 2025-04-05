@@ -5,114 +5,17 @@ import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Recipe } from '@/types';
-import { ArrowLeft, Clock, ChefHat, DollarSign, Share2, Printer, Bookmark, Star, Heart } from 'lucide-react';
-
-// Mock recipe data - would come from Supabase in real implementation
-const mockRecipes: Record<string, Recipe> = {
-  '1': {
-    id: '1',
-    title: 'Lemon Garlic Roasted Chicken with Spring Vegetables',
-    ingredients: [
-      'Whole chicken (on sale at Kroger)',
-      'Fresh lemons',
-      'Garlic bulb',
-      'Rosemary sprigs',
-      'Asparagus bundle (30% off)',
-      'Baby potatoes (buy one get one)',
-      'Olive oil',
-      'Salt and pepper',
-    ],
-    instructions: [
-      'Preheat oven to 425°F',
-      'Prepare chicken with lemon, garlic, and herbs',
-      'Add vegetables around the chicken',
-      'Roast for 1 hour or until internal temperature reaches 165°F',
-      'Let rest before serving',
-    ],
-    cookingTime: 70,
-    difficultyLevel: 'medium',
-    cuisine: 'American',
-    savings: 8.75,
-    dealItems: [
-      { name: 'Whole Chicken', price: 6.99, originalPrice: 9.99 },
-      { name: 'Asparagus Bundle', price: 2.99, originalPrice: 4.29 },
-      { name: 'Baby Potatoes (2 bags)', price: 3.49, originalPrice: 6.98 },
-    ],
-    createdAt: '2023-04-01T12:00:00Z',
-  },
-  '2': {
-    id: '2',
-    title: 'Mediterranean Pasta Primavera',
-    ingredients: [
-      'Whole grain pasta (30% off)',
-      'Cherry tomatoes (on sale)',
-      'Zucchini',
-      'Bell peppers (buy one get one)',
-      'Red onion',
-      'Feta cheese (markdown special)',
-      'Olive oil',
-      'Balsamic vinegar',
-      'Fresh basil',
-    ],
-    instructions: [
-      'Cook pasta according to package instructions',
-      'Sauté vegetables until tender',
-      'Combine pasta and vegetables',
-      'Add feta cheese and dressing',
-      'Garnish with fresh basil',
-    ],
-    cookingTime: 30,
-    difficultyLevel: 'easy',
-    cuisine: 'Mediterranean',
-    savings: 6.25,
-    dealItems: [
-      { name: 'Whole Grain Pasta', price: 1.99, originalPrice: 2.79 },
-      { name: 'Cherry Tomatoes', price: 2.50, originalPrice: 3.99 },
-      { name: 'Bell Peppers (2)', price: 2.99, originalPrice: 5.98 },
-      { name: 'Feta Cheese', price: 3.49, originalPrice: 4.29 },
-    ],
-    createdAt: '2023-04-02T14:30:00Z',
-  },
-  '3': {
-    id: '3',
-    title: 'Grilled Salmon with Mango Salsa',
-    ingredients: [
-      'Salmon fillets (weekly special)',
-      'Fresh mangos (on sale)',
-      'Red onion',
-      'Jalapeño',
-      'Cilantro',
-      'Lime juice',
-      'Avocado (reduced price)',
-      'Brown rice',
-    ],
-    instructions: [
-      'Prepare mango salsa with diced mango, onion, jalapeño, cilantro, and lime',
-      'Season salmon fillets',
-      'Grill salmon for 4-5 minutes per side',
-      'Serve salmon over rice topped with mango salsa',
-    ],
-    cookingTime: 25,
-    difficultyLevel: 'medium',
-    cuisine: 'Fusion',
-    savings: 9.50,
-    dealItems: [
-      { name: 'Salmon Fillets', price: 8.99, originalPrice: 14.99 },
-      { name: 'Mangos (2)', price: 2.00, originalPrice: 3.98 },
-      { name: 'Avocados', price: 1.25, originalPrice: 1.99 },
-    ],
-    createdAt: '2023-04-03T18:15:00Z',
-  },
-};
+import { ArrowLeft, Clock, ChefHat, DollarSign, Share2, Printer, Heart } from 'lucide-react';
+import { useRecipes } from '@/context/RecipeContext';
 
 const RecipeDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const [isFavorite, setIsFavorite] = useState(false);
   const { toast } = useToast();
+  const { recipes } = useRecipes();
   
-  // In a real app, fetch recipe from Supabase
-  const recipe = id ? mockRecipes[id] : undefined;
+  // Find recipe by id
+  const recipe = recipes.find(r => r.id === id);
   
   if (!recipe) {
     return (
@@ -175,8 +78,6 @@ const RecipeDetailPage = () => {
         <div className="md:w-2/3">
           <div className="aspect-video bg-muted rounded-lg mb-6 relative flex items-center justify-center">
             <ChefHat className="h-16 w-16 text-muted-foreground opacity-50" />
-            
-            {/* This would display the actual recipe image */}
           </div>
           
           <div className="flex flex-wrap items-center gap-3 mb-4">

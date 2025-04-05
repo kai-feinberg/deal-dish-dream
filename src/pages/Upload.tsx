@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { Camera, Image, Loader2 } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
-import { OPENROUTER_API_KEY } from '@/lib/openrouter';
+import { generateRecipeFromImage } from '@/services/openRouterService';
+import { useRecipes } from '@/context/RecipeContext';
 
 const UploadPage = () => {
   const [files, setFiles] = useState<File[]>([]);
@@ -20,6 +21,7 @@ const UploadPage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { addRecipe } = useRecipes();
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.length) return;
@@ -82,21 +84,34 @@ const UploadPage = () => {
     
     setIsUploading(true);
     
-    // Placeholder for Supabase upload
-    setTimeout(() => {
-      setIsUploading(false);
-      setIsProcessing(true);
+    try {
+      // Process each image to generate recipes
+      for (let i = 0; i < previews.length; i++) {
+        setIsProcessing(true);
+        
+        const generatedRecipe = await generateRecipeFromImage(previews[i], customPrompt);
+        
+        if (generatedRecipe) {
+          addRecipe(generatedRecipe);
+          toast({
+            title: "Recipe generated!",
+            description: `"${generatedRecipe.title}" has been created based on your deals.`,
+          });
+        }
+      }
       
-      // Placeholder for OpenRouter AI processing
-      setTimeout(() => {
-        setIsProcessing(false);
-        toast({
-          title: "Success!",
-          description: "Your deal images have been processed and recipes generated.",
-        });
-        navigate("/recipes");
-      }, 2000);
-    }, 1500);
+      navigate("/recipes");
+    } catch (error) {
+      console.error("Error processing images:", error);
+      toast({
+        title: "Error processing images",
+        description: "There was a problem generating recipes from your images. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+      setIsProcessing(false);
+    }
   };
   
   return (
