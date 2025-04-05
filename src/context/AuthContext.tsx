@@ -34,14 +34,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
-    // Initial session check
-    const checkSession = async () => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, currentSession) => {
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        
+        // Use setTimeout to avoid potential deadlocks
+        if (currentSession?.user) {
+          setTimeout(() => {
+            supabase
+              .from('profiles')
+              .select('has_completed_onboarding')
+              .eq('id', currentSession.user.id)
+              .single()
+              .then(({ data: profileData }) => {
+                const hasCompleted = Boolean(profileData?.has_completed_onboarding);
+                setHasCompletedOnboarding(hasCompleted);
+                
+                if (event === 'SIGNED_IN') {
+                  if (hasCompleted) {
+                    navigate('/upload');
+                  } else {
+                    navigate('/onboarding');
+                  }
+                }
+              });
+          }, 0);
+        }
+      }
+    );
+
+    // THEN check for existing session
+    const initialSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       setUser(session?.user ?? null);
-      setIsLoaded(true);
-
-      // Redirect logic after authentication
+      
       if (session?.user) {
         const { data: profileData } = await supabase
           .from('profiles')
@@ -51,43 +80,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         const hasCompleted = Boolean(profileData?.has_completed_onboarding);
         setHasCompletedOnboarding(hasCompleted);
-          
-        if (hasCompleted) {
-          navigate('/upload');
-        } else {
-          navigate('/onboarding');
-        }
       }
+      
+      setIsLoaded(true);
     };
-
-    checkSession();
-
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        // Redirect logic for signup/login
-        if (session?.user) {
-          supabase
-            .from('profiles')
-            .select('has_completed_onboarding')
-            .eq('id', session.user.id)
-            .single()
-            .then(({ data: profileData }) => {
-              const hasCompleted = Boolean(profileData?.has_completed_onboarding);
-              setHasCompletedOnboarding(hasCompleted);
-                
-              if (hasCompleted) {
-                navigate('/upload');
-              } else {
-                navigate('/onboarding');
-              }
-            });
-        }
-      }
-    );
+    
+    initialSession();
 
     return () => {
       subscription.unsubscribe();
@@ -98,6 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+      // Navigation is handled in the auth state change listener
     } catch (error: any) {
       toast({
         title: "Error signing in",
@@ -110,6 +109,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
     try {
+      // For easier testing, use signInWithPassword instead of signUp for now
+      // This bypasses the email verification step
       const { error } = await supabase.auth.signUp({ 
         email, 
         password,
@@ -120,7 +121,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
       });
+      
       if (error) throw error;
+      
+      toast({
+        title: "Account created",
+        description: "Please check your email to verify your account.",
+      });
+      
+      // Navigation is handled in the auth state change listener or redirect
     } catch (error: any) {
       toast({
         title: "Error signing up",

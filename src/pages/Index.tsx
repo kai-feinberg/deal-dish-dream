@@ -6,8 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChefHat } from "lucide-react";
+import { ChefHat, AlertCircle } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const Index = () => {
   const { user, isLoaded, signIn, signUp, hasCompletedOnboarding } = useAuth();
@@ -17,6 +18,7 @@ const Index = () => {
   const [lastName, setLastName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [justSignedUp, setJustSignedUp] = useState(false);
+  const [formError, setFormError] = useState("");
 
   if (!isLoaded) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
@@ -32,12 +34,14 @@ const Index = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError("");
     setIsSubmitting(true);
     
     try {
       await signIn(email, password);
     } catch (err) {
-      // Error is handled in the context
+      // Error is handled in the context, but we can clear the form
+      setPassword("");
     } finally {
       setIsSubmitting(false);
     }
@@ -45,13 +49,15 @@ const Index = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError("");
     setIsSubmitting(true);
     
     try {
       await signUp(email, password, firstName, lastName);
       setJustSignedUp(true);
-    } catch (err) {
+    } catch (err: any) {
       // Error is handled in the context
+      setPassword("");
     } finally {
       setIsSubmitting(false);
     }
@@ -87,6 +93,12 @@ const Index = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {formError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{formError}</AlertDescription>
+                  </Alert>
+                )}
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -126,6 +138,12 @@ const Index = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {formError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{formError}</AlertDescription>
+                  </Alert>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">First name</Label>
