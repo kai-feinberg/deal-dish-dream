@@ -20,7 +20,7 @@ const RecipesPage = () => {
     // Filter recipes based on search term
     const filtered = recipes.filter(recipe => 
       recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      recipe.cuisine.toLowerCase().includes(searchTerm.toLowerCase())
+      (recipe.cuisine && recipe.cuisine.toLowerCase().includes(searchTerm.toLowerCase()))
     );
     setFilteredRecipes(filtered);
   }, [recipes, searchTerm]);
@@ -89,12 +89,16 @@ const RecipesPage = () => {
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
                     <div>
-                      <span className={`inline-block text-xs font-medium px-2.5 py-0.5 rounded-full ${getDifficultyColor(recipe.difficultyLevel)} mb-2`}>
-                        {recipe.difficultyLevel.charAt(0).toUpperCase() + recipe.difficultyLevel.slice(1)}
-                      </span>
-                      <span className="inline-block text-xs font-medium px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground ml-2 mb-2">
-                        {recipe.cuisine}
-                      </span>
+                      {recipe.difficultyLevel && (
+                        <span className={`inline-block text-xs font-medium px-2.5 py-0.5 rounded-full ${getDifficultyColor(recipe.difficultyLevel)} mb-2`}>
+                          {recipe.difficultyLevel.charAt(0).toUpperCase() + recipe.difficultyLevel.slice(1)}
+                        </span>
+                      )}
+                      {recipe.cuisine && (
+                        <span className="inline-block text-xs font-medium px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground ml-2 mb-2">
+                          {recipe.cuisine}
+                        </span>
+                      )}
                     </div>
                     <div className="flex items-center text-muted-foreground">
                       <Clock className="h-3.5 w-3.5 mr-1" />
