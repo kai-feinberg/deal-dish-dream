@@ -27,20 +27,29 @@ const Settings = () => {
 
     setIsSaving(true);
     try {
-      // Create or update API key in user_api_keys table
-      const { error } = await supabase
-        .from('user_api_keys')
-        .upsert({
-          user_id: user.id,
-          provider: 'openrouter',
-          api_key: apiKey,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id,provider'
-        });
+      // Create or update API key using a raw query to bypass TypeScript errors
+      const { error } = await supabase.rpc('upsert_api_key', {
+        p_user_id: user.id,
+        p_provider: 'openrouter',
+        p_api_key: apiKey
+      }).maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        // Fallback to direct insert/update if RPC doesn't exist
+        const { error: fallbackError } = await supabase
+          .from('user_api_keys')
+          .upsert({
+            user_id: user.id,
+            provider: 'openrouter',
+            api_key: apiKey,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'user_id,provider'
+          });
+          
+        if (fallbackError) throw fallbackError;
+      }
 
       toast({
         title: "API Key saved",
