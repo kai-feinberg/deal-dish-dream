@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +13,7 @@ import { Profile, UserPreferences } from "@/types/database";
 const ProfilePage = () => {
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [preferences, setPreferences<{
+  const [preferences, setPreferences] = useState<{
     dietaryRestrictions: string[];
     allergies: string[];
     preferences: string[];
