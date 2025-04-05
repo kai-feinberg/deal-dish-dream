@@ -1,22 +1,27 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { Key } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/context/AuthContext";
 
 const Settings = () => {
   const [apiKey, setApiKey] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
-  const { user } = useAuth();
 
-  const handleSaveApiKey = async () => {
-    if (!apiKey.trim() || !user) {
+  // Load API key from localStorage on component mount
+  useEffect(() => {
+    const savedKey = localStorage.getItem("openrouter-api-key");
+    if (savedKey) {
+      setApiKey(savedKey);
+    }
+  }, []);
+
+  const handleSaveApiKey = () => {
+    if (!apiKey.trim()) {
       toast({
         title: "Error",
         description: "Please enter a valid API key.",
@@ -27,36 +32,14 @@ const Settings = () => {
 
     setIsSaving(true);
     try {
-      // Use RPC to save the key
-      const { error } = await supabase.rpc('upsert_api_key', {
-        p_user_id: user.id,
-        p_provider: 'openrouter',
-        p_api_key: apiKey
-      });
-
-      if (error) {
-        // Fallback to direct insert/update if RPC doesn't exist yet
-        const { error: fallbackError } = await supabase.from('user_api_keys')
-          .upsert({
-            user_id: user.id,
-            provider: 'openrouter',
-            api_key: apiKey,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }, {
-            onConflict: 'user_id,provider'
-          });
-          
-        if (fallbackError) throw fallbackError;
-      }
+      // Save API key to localStorage
+      localStorage.setItem("openrouter-api-key", apiKey);
 
       toast({
         title: "API Key saved",
         description: "Your OpenRouter API key has been saved successfully.",
       });
       
-      // Clear input after successful save
-      setApiKey("");
     } catch (error: any) {
       toast({
         title: "Error saving API key",
@@ -66,6 +49,15 @@ const Settings = () => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleClearApiKey = () => {
+    localStorage.removeItem("openrouter-api-key");
+    setApiKey("");
+    toast({
+      title: "API Key cleared",
+      description: "Your OpenRouter API key has been removed.",
+    });
   };
 
   return (
@@ -94,6 +86,16 @@ const Settings = () => {
                 {isSaving ? "Saving..." : "Save"}
               </Button>
             </div>
+            <div className="flex justify-end mt-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleClearApiKey}
+                className="text-xs"
+              >
+                Clear Key
+              </Button>
+            </div>
             <p className="text-sm text-muted-foreground mt-1">
               Required for generating AI-powered recipes from your grocery deals
             </p>
@@ -103,7 +105,7 @@ const Settings = () => {
           <div className="flex items-start space-x-2 text-sm text-muted-foreground">
             <Key className="h-4 w-4 mt-0.5" />
             <p>
-              Your API keys are securely stored and used only to generate recipes based on your deal images.{" "}
+              Your API key is stored locally on your device and used only to generate recipes based on your deal images.{" "}
               <a 
                 href="https://openrouter.ai/keys" 
                 target="_blank" 
