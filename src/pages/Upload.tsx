@@ -10,6 +10,7 @@ import { Camera, Image, Loader2 } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
 import { generateRecipeFromImage } from '@/services/openRouterService';
 import { useRecipes } from '@/context/RecipeContext';
+import { Progress } from '@/components/ui/progress';
 
 const UploadPage = () => {
   const [files, setFiles] = useState<File[]>([]);
@@ -17,6 +18,8 @@ const UploadPage = () => {
   const [customPrompt, setCustomPrompt] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processingProgress, setProcessingProgress] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -87,9 +90,22 @@ const UploadPage = () => {
     try {
       // Process each image to generate recipes
       for (let i = 0; i < previews.length; i++) {
+        setCurrentImageIndex(i);
         setIsProcessing(true);
+        setProcessingProgress(0);
+        
+        // Simulate progress updates
+        const progressInterval = setInterval(() => {
+          setProcessingProgress(prev => {
+            const newProgress = prev + 10;
+            return newProgress > 90 ? 90 : newProgress;
+          });
+        }, 1000);
         
         const generatedRecipe = await generateRecipeFromImage(previews[i], customPrompt);
+        
+        clearInterval(progressInterval);
+        setProcessingProgress(100);
         
         if (generatedRecipe) {
           addRecipe(generatedRecipe);
@@ -97,9 +113,19 @@ const UploadPage = () => {
             title: "Recipe generated!",
             description: `"${generatedRecipe.title}" has been created based on your deals.`,
           });
+          
+          // Wait a moment to show 100% progress before moving to next image
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } else {
+          toast({
+            title: "Failed to generate recipe",
+            description: "We couldn't generate a recipe from this image. Please try another image.",
+            variant: "destructive",
+          });
         }
       }
       
+      // Once all recipes are generated, navigate to recipes page
       navigate("/recipes");
     } catch (error) {
       console.error("Error processing images:", error);
@@ -111,7 +137,13 @@ const UploadPage = () => {
     } finally {
       setIsUploading(false);
       setIsProcessing(false);
+      setProcessingProgress(0);
     }
+  };
+  
+  const getProcessingStatusText = () => {
+    if (!isProcessing) return "";
+    return `Processing image ${currentImageIndex + 1} of ${previews.length}...`;
   };
   
   return (
@@ -142,6 +174,7 @@ const UploadPage = () => {
                 onChange={handleFileChange}
                 className="hidden"
                 ref={fileInputRef}
+                disabled={isUploading || isProcessing}
               />
               <div className="flex flex-col items-center space-y-2">
                 <div className="p-3 bg-primary/10 rounded-full">
@@ -168,6 +201,7 @@ const UploadPage = () => {
                       <button
                         onClick={() => removeFile(index)}
                         className="absolute top-1 right-1 bg-black/70 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        disabled={isUploading || isProcessing}
                       >
                         ×
                       </button>
@@ -187,21 +221,35 @@ const UploadPage = () => {
                 value={customPrompt}
                 onChange={(e) => setCustomPrompt(e.target.value)}
                 className="min-h-[100px]"
+                disabled={isUploading || isProcessing}
               />
             </div>
+            
+            {isProcessing && (
+              <div className="mt-6 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>{getProcessingStatusText()}</span>
+                  <span>{processingProgress}%</span>
+                </div>
+                <Progress value={processingProgress} className="h-2" />
+              </div>
+            )}
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={() => navigate("/recipes")}>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/recipes")}
+              disabled={isUploading || isProcessing}
+            >
               Cancel
             </Button>
             <Button 
               onClick={handleSubmit} 
-              disabled={isUploading || isProcessing}
+              disabled={isUploading || isProcessing || previews.length === 0}
               className="relative"
             >
-              {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isUploading ? "Uploading..." : isProcessing ? "Analyzing deals..." : "Generate Recipes"}
+              {(isUploading || isProcessing) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isUploading ? "Uploading..." : isProcessing ? "Generating Recipe..." : "Generate Recipes"}
             </Button>
           </CardFooter>
         </Card>

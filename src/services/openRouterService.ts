@@ -37,7 +37,7 @@ export const generateRecipeFromImage = async (
         messages: [
           {
             role: "system",
-            content: "You are a helpful assistant that creates recipes based on grocery deal images. Return only JSON with no explanations or other text."
+            content: "You are a helpful assistant that creates recipes based on grocery deal images. Return only JSON with no explanations or other text. Always include dealItems array with name, price, and originalPrice for each item identified in the image."
           },
           {
             role: "user",
@@ -58,10 +58,22 @@ export const generateRecipeFromImage = async (
     }
 
     const data = await response.json();
-    const recipeData = JSON.parse(data.choices[0].message.content) as RecipeResponse;
+    console.log("OpenRouter API response:", data);
+    
+    let recipeData: RecipeResponse;
+    try {
+      recipeData = JSON.parse(data.choices[0].message.content) as RecipeResponse;
+    } catch (error) {
+      console.error("Error parsing recipe data:", error);
+      console.log("Raw content:", data.choices[0].message.content);
+      throw new Error("Failed to parse recipe data");
+    }
+    
+    // Ensure dealItems exists or provide a default empty array
+    const dealItems = recipeData.dealItems || [];
     
     // Calculate total savings
-    const savings = recipeData.dealItems.reduce(
+    const savings = dealItems.reduce(
       (total, item) => total + (item.originalPrice - item.price),
       0
     );
@@ -75,7 +87,7 @@ export const generateRecipeFromImage = async (
       difficultyLevel: recipeData.difficultyLevel,
       cuisine: recipeData.cuisine,
       savings,
-      dealItems: recipeData.dealItems,
+      dealItems,
       createdAt: new Date().toISOString()
     };
   } catch (error) {
