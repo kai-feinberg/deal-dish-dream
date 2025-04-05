@@ -17,9 +17,9 @@ import { RecipeProvider } from './context/RecipeContext';
 
 function App() {
   return (
-    <AuthProvider>
-      <RecipeProvider>
-        <Router>
+    <Router>
+      <AuthProvider>
+        <RecipeProvider>
           <Toaster />
           <Routes>
             <Route path="/" element={<Layout />}>
@@ -33,9 +33,9 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
-        </Router>
-      </RecipeProvider>
-    </AuthProvider>
+        </RecipeProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

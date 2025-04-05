@@ -33,7 +33,7 @@ export const generateRecipeFromImage = async (
         "Authorization": `Bearer ${OPENROUTER_API_KEY}`
       },
       body: JSON.stringify({
-        model: "anthropic/claude-3-opus:beta",
+        model: "google/gemini-2.0-flash-001",
         messages: [
           {
             role: "system",
