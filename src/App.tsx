@@ -15,8 +15,12 @@ import ProfilePage from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Protected from "./components/Protected";
 
-// You'll need to get this from Clerk's dashboard
-const PUBLISHABLE_KEY = ""; // Needs to be filled by the user
+// For development, you can paste your key directly here
+const PUBLISHABLE_KEY = "pk_test_ZGVhbGluZy1yb2RlbnQtNzcuY2xlcmsuYWNjb3VudHMuZGV2JA";
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error("Missing Clerk Publishable Key. Get your key from https://dashboard.clerk.com/last-active?path=api-keys");
+}
 
 const queryClient = new QueryClient();
 
