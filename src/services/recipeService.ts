@@ -1,7 +1,7 @@
 import { Recipe } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 
-const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400/e2e8f0/64748b?text=Recipe+Image';
+const PLACEHOLDER_IMAGE = '/chef.webp';
 
 export const fetchUserRecipes = async (): Promise<Recipe[]> => {
   try {

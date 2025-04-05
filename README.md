@@ -10,13 +10,6 @@ Deal Dish Dream is an innovative application that transforms grocery shopping de
 - Discover new recipes tailored to available ingredients
 - Build a personalized recipe collection
 
-## About us
-Together, Bryden Behrens and I have saved over $750 using Jewel Osco deals.
-<div style="display: flex; justify-content: space-between;">
-    <img src="public/image.png" alt="Image of Grocery Deals" style="max-width: 48%; height: auto;" />
-    <img src="public/bryden_savings.png" alt="Bryden's Savings" style="max-width: 48%; height: auto;" />
-</div>
-
 ## Why We Built This
 
 In today's economy, many people struggle with:

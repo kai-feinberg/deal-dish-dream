@@ -8,7 +8,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 const Layout: React.FC = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
-  
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b px-4 py-3">
@@ -26,11 +26,11 @@ const Layout: React.FC = () => {
           )}
         </div>
       </header>
-      
+
       <main className="flex-1 container mx-auto py-6 px-4">
         <Outlet />
       </main>
-      
+
       {isMobile && (
         <nav className="fixed bottom-0 w-full border-t bg-background">
           <div className="flex justify-around items-center h-16">
@@ -53,7 +53,7 @@ interface NavLinkProps {
 
 const NavLink: React.FC<NavLinkProps> = ({ to, currentPath, children }) => {
   const isActive = currentPath === to;
-  
+
   return (
     <Link
       to={to}

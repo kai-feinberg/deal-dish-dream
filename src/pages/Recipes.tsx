@@ -44,7 +44,7 @@ const RecipesPage = () => {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col items-center justify-center min-h-[400px] text-muted-foreground">
-          <ChefHat className="h-12 w-12 animate-pulse mb-4" />
+          <img src="/chef.webp" alt="Chef" className="h-12 w-12 animate-pulse mb-4" />
           <p>Loading your recipes...</p>
         </div>
       </div>
@@ -118,9 +118,8 @@ const RecipesPage = () => {
             {filteredRecipes.map((recipe) => (
               <Card key={recipe.id} className="overflow-hidden hover:shadow-md transition-shadow">
                 <div className="aspect-video relative bg-muted">
-                  {/* This would be the recipe image */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <ChefHat className="h-12 w-12 text-muted-foreground opacity-50" />
+                    <img src="/chef.webp" alt="Chef" className="h-12 w-12 text-muted-foreground opacity-50" />
                   </div>
                 </div>
                 <CardHeader className="pb-2">

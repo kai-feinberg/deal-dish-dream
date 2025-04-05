@@ -2,7 +2,7 @@ import { Recipe, DealItem } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
-const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400/e2e8f0/64748b?text=Recipe+Image';
+const PLACEHOLDER_IMAGE = '/chef.webp';
 
 interface RecipeResponse {
   title: string;

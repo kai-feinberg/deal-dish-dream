@@ -36,7 +36,7 @@ const Index = () => {
     e.preventDefault();
     setFormError("");
     setIsSubmitting(true);
-    
+
     try {
       await signIn(email, password);
     } catch (err) {
@@ -51,7 +51,7 @@ const Index = () => {
     e.preventDefault();
     setFormError("");
     setIsSubmitting(true);
-    
+
     try {
       await signUp(email, password, firstName, lastName);
       setJustSignedUp(true);
@@ -62,7 +62,7 @@ const Index = () => {
       setIsSubmitting(false);
     }
   };
-  
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] gap-8">
       <div className="text-center space-y-4 mb-6">
@@ -76,14 +76,14 @@ const Index = () => {
           Generate personalized recipes from your weekly grocery deals. Save money and eat better!
         </p>
       </div>
-      
+
       <Card className="w-full max-w-md">
         <Tabs defaultValue="signin">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="signin">Sign In</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="signin">
             <form onSubmit={handleSignIn}>
               <CardHeader>
@@ -128,7 +128,7 @@ const Index = () => {
               </CardFooter>
             </form>
           </TabsContent>
-          
+
           <TabsContent value="signup">
             <form onSubmit={handleSignUp}>
               <CardHeader>

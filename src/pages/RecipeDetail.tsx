@@ -46,7 +46,7 @@ const RecipeDetailPage = () => {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="flex flex-col items-center justify-center min-h-[400px] text-muted-foreground">
-          <ChefHat className="h-12 w-12 animate-pulse mb-4" />
+          <img src="/chef.webp" alt="Chef" className="h-12 w-12 animate-pulse mb-4" />
           <p>Loading recipe...</p>
         </div>
       </div>
@@ -124,7 +124,7 @@ const RecipeDetailPage = () => {
       <div className="flex flex-col md:flex-row gap-8">
         <div className="md:w-2/3">
           <div className="aspect-video bg-muted rounded-lg mb-6 relative flex items-center justify-center">
-            <ChefHat className="h-16 w-16 text-muted-foreground opacity-50" />
+            <img src="/chef.webp" alt="Chef" className="h-16 w-16 text-muted-foreground opacity-50" />
           </div>
 
           <div className="flex flex-wrap items-center gap-3 mb-4">
