@@ -36,6 +36,61 @@ export type Database = {
         }
         Relationships: []
       }
+      recipes: {
+        Row: {
+          id: string
+          title: string
+          ingredients: string[]
+          instructions: string[]
+          cooking_time: number
+          difficulty_level: string
+          cuisine: string
+          deal_items: {
+            name: string
+          }[]
+          created_at: string
+          user_id: string
+          image_url?: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          ingredients: string[]
+          instructions: string[]
+          cooking_time: number
+          difficulty_level: string
+          cuisine: string
+          deal_items: {
+            name: string
+          }[]
+          created_at?: string
+          user_id: string
+          image_url?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          ingredients?: string[]
+          instructions?: string[]
+          cooking_time?: number
+          difficulty_level?: string
+          cuisine?: string
+          deal_items?: {
+            name: string
+          }[]
+          created_at?: string
+          user_id?: string
+          image_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipes_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       user_preferences: {
         Row: {
           allergies: string[] | null

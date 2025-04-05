@@ -1,4 +1,3 @@
-
 export interface UserPreferences {
   dietaryRestrictions: string[];
   allergies: string[];
@@ -7,8 +6,6 @@ export interface UserPreferences {
 
 export interface DealItem {
   name: string;
-  price: number;
-  originalPrice?: number;
   store?: string;
   category?: string;
   unit?: string;
@@ -22,7 +19,6 @@ export interface Recipe {
   cookingTime: number;
   difficultyLevel: 'easy' | 'medium' | 'hard';
   cuisine: string;
-  savings: number;
   dealItems: DealItem[];
   imageUrl?: string;
   createdAt: string;

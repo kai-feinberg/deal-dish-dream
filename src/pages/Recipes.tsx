@@ -1,30 +1,32 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, ChevronRight, Clock, ChefHat, DollarSign } from 'lucide-react';
+import { Search, ChevronRight, Clock, ChefHat, DollarSign, RefreshCcw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Recipe } from '@/types';
 import { useRecipes } from '@/context/RecipeContext';
 
+// Access the OpenRouter API key from environment variables
+const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
+
 const RecipesPage = () => {
   const { user } = useAuth();
-  const { recipes } = useRecipes();
+  const { recipes, isLoading, error, refetchRecipes } = useRecipes();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>(recipes);
-  
+
   useEffect(() => {
     // Filter recipes based on search term
-    const filtered = recipes.filter(recipe => 
-      recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (recipe.cuisine && recipe.cuisine.toLowerCase().includes(searchTerm.toLowerCase()))
+    const filtered = recipes.filter(recipe =>
+      (recipe.title?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+      (recipe.cuisine?.toLowerCase().includes(searchTerm.toLowerCase()) || false)
     );
     setFilteredRecipes(filtered);
   }, [recipes, searchTerm]);
-  
+
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'easy':
@@ -37,7 +39,32 @@ const RecipesPage = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-  
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col items-center justify-center min-h-[400px] text-muted-foreground">
+          <ChefHat className="h-12 w-12 animate-pulse mb-4" />
+          <p>Loading your recipes...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col items-center justify-center min-h-[400px] text-muted-foreground">
+          <p className="text-red-500 mb-4">{error}</p>
+          <Button onClick={refetchRecipes} variant="outline" size="sm">
+            <RefreshCcw className="h-4 w-4 mr-2" />
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -69,14 +96,24 @@ const RecipesPage = () => {
           <TabsTrigger value="recent">Recent</TabsTrigger>
           <TabsTrigger value="favorites">Favorites</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="all" className="space-y-6">
           {filteredRecipes.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">No recipes found. Try another search or generate new recipes.</p>
+              <p className="text-muted-foreground">
+                {searchTerm
+                  ? "No recipes found. Try another search term."
+                  : "No recipes yet. Generate your first recipe by uploading a deals image!"
+                }
+              </p>
+              {!searchTerm && (
+                <Button asChild className="mt-4">
+                  <Link to="/upload">Get Started</Link>
+                </Button>
+              )}
             </div>
           )}
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredRecipes.map((recipe) => (
               <Card key={recipe.id} className="overflow-hidden hover:shadow-md transition-shadow">
@@ -110,12 +147,26 @@ const RecipesPage = () => {
                 <CardContent className="pb-3">
                   <div className="flex items-center text-recipe-orange">
                     <DollarSign className="h-4 w-4 mr-1" />
-                    <span className="font-medium">${recipe.savings.toFixed(2)} savings</span>
+                    <span className="font-medium">
+                      {recipe.dealItems.length} items on sale
+                    </span>
                   </div>
                   <p className="text-muted-foreground text-sm mt-2 line-clamp-2">
                     {recipe.ingredients.slice(0, 3).join(', ')}
                     {recipe.ingredients.length > 3 ? ` and ${recipe.ingredients.length - 3} more...` : ''}
                   </p>
+                  {recipe.dealItems.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {recipe.dealItems.map((item, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center px-2 py-0.5 rounded bg-recipe-orange/10 text-recipe-orange text-xs"
+                        >
+                          {item.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
                 <CardFooter>
                   <Button variant="outline" asChild className="w-full">
@@ -129,13 +180,13 @@ const RecipesPage = () => {
             ))}
           </div>
         </TabsContent>
-        
+
         <TabsContent value="recent">
           <div className="text-center py-12">
             <p className="text-muted-foreground">Filter view based on recent recipes would be populated here.</p>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="favorites">
           <div className="text-center py-12">
             <p className="text-muted-foreground">Filter view based on favorite recipes would be populated here.</p>

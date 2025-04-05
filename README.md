@@ -59,6 +59,9 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Supabase
+
+Using Lovable and Cursor
 
 ## How can I deploy this project?
 
