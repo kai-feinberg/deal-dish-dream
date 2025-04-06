@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -64,7 +63,7 @@ const Index = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] gap-8">
+    <div className="flex flex-col items-center justify-center min-h-[80vh] gap-8 pb-16">
       <div className="text-center space-y-4 mb-6">
         <div className="flex flex-col items-center">
           <div className="bg-recipe-peach p-4 rounded-full mb-4">

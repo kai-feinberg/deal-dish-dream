@@ -10,6 +10,39 @@ Deal Dish Dream is an innovative application that transforms grocery shopping de
 - Discover new recipes tailored to available ingredients
 - Build a personalized recipe collection
 
+## Key Features
+
+1. **Database & Real-time Sync**
+   - Powered by Supabase
+   - Real-time data synchronization
+   - Efficient data querying and storage
+
+2. **Secure Authentication**
+   - Email/password authentication
+   - Session management
+   - Protected routes
+   - User profile management
+
+3. **Advanced AI Integration**
+   - Multimodal AI processing (text + images)
+   - Model agnostic architecture via OpenRouter
+   - Structured recipe generation
+   - Intelligent deal recognition
+
+4. **Search & Discovery**
+   - Full-text search capabilities
+   - Recipe and cuisine tag filtering
+
+5. **Mobile-First Design**
+   - Full mobile responsiveness
+   - Adaptive UI components
+
+6. **Type Safety & Code Quality**
+   - Full TypeScript implementation
+   - End-to-end type safety
+   - Strict type checking
+   - Type-safe API interactions
+
 ## Why We Built This
 
 In today's economy, many people struggle with:
@@ -47,7 +80,6 @@ Deal Dish Dream addresses these challenges by automatically generating recipes b
    - Recipe generation from deal images
    - Recipe storage and organization
    - Personalized recipe collections
-   - Recipe sharing capabilities
 
 3. **Deal Processing**
    - Image processing for deal recognition
